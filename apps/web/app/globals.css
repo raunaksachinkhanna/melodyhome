@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-brown: #3E0E00;
+  --color-gold:  #C9913A;
+  --color-cream: #F6EFE2;
+}
