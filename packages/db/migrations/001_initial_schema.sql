@@ -4,9 +4,9 @@
 
 BEGIN;
 
--- ─────────────────────────────────────────────
+
 -- Enum types
--- ─────────────────────────────────────────────
+
 
 CREATE TYPE order_status AS ENUM (
     'pending',
@@ -43,9 +43,8 @@ CREATE TYPE corporate_inquiry_status AS ENUM (
     'cancelled'
 );
 
--- ─────────────────────────────────────────────
 -- Reusable updated_at trigger
--- ─────────────────────────────────────────────
+
 
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
@@ -55,9 +54,7 @@ BEGIN
 END;
 $$;
 
--- ─────────────────────────────────────────────
 -- products
--- ─────────────────────────────────────────────
 
 CREATE TABLE products (
     id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -85,9 +82,7 @@ CREATE TRIGGER trg_products_updated_at
     BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- ─────────────────────────────────────────────
 -- product_variants
--- ─────────────────────────────────────────────
 
 CREATE TABLE product_variants (
     id          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -113,13 +108,13 @@ CREATE TRIGGER trg_product_variants_updated_at
     BEFORE UPDATE ON product_variants
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- ─────────────────────────────────────────────
+
 -- orders
 --
 -- idempotency_key: set to the Razorpay order_id at checkout creation.
 -- The payment.captured webhook checks this column before writing any
 -- order record, preventing duplicate processing on retried webhooks.
--- ─────────────────────────────────────────────
+
 
 CREATE TABLE orders (
     id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -154,12 +149,10 @@ CREATE TRIGGER trg_orders_updated_at
     BEFORE UPDATE ON orders
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- ─────────────────────────────────────────────
 -- order_items
 --
 -- hsn_code is denormalised from Product at order time for GST
 -- invoice compliance — the product's HSN may change later.
--- ─────────────────────────────────────────────
 
 CREATE TABLE order_items (
     id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -178,13 +171,12 @@ CREATE TABLE order_items (
 CREATE INDEX idx_order_items_order_id           ON order_items (order_id);
 CREATE INDEX idx_order_items_product_variant_id ON order_items (product_variant_id);
 
--- ─────────────────────────────────────────────
 -- notifications
 --
 -- UNIQUE (order_id, channel, event) prevents duplicate notifications
 -- being queued for the same lifecycle event on the same order.
 -- retry_count is incremented by the SQS consumer on each failed attempt.
--- ─────────────────────────────────────────────
+
 
 CREATE TABLE notifications (
     id              UUID                    PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -212,9 +204,7 @@ CREATE TRIGGER trg_notifications_updated_at
     BEFORE UPDATE ON notifications
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- ─────────────────────────────────────────────
 -- corporate_inquiries
--- ─────────────────────────────────────────────
 
 CREATE TABLE corporate_inquiries (
     id              UUID                        PRIMARY KEY DEFAULT gen_random_uuid(),
