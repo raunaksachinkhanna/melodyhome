@@ -5,9 +5,9 @@
 
 BEGIN;
 
--- ─────────────────────────────────────────────
+
 -- Products (parent records, 13 rows)
--- ─────────────────────────────────────────────
+
 
 INSERT INTO products (sku, name, category, hsn_code, base_price, mrp, lead_time_days)
 VALUES
@@ -34,10 +34,10 @@ VALUES
 
 ON CONFLICT (sku) DO NOTHING;
 
--- ─────────────────────────────────────────────
+
 -- Product Variants (20 rows, all 20 PRD SKUs)
 -- product_id resolved via subselect on parent sku
--- ─────────────────────────────────────────────
+
 
 INSERT INTO product_variants (product_id, sku, colour, size, fragrance, price, mrp)
 VALUES
