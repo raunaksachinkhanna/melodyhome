@@ -33,6 +33,20 @@ interface OrderItemInput {
   hsn_code: string;
 }
 
+interface PgError {
+  code: string;
+  constraint?: string;
+}
+
+function isUniqueViolation(err: unknown): err is PgError {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'code' in err &&
+    (err as { code: unknown }).code === '23505'
+  );
+}
+
 // ─── POST /api/webhooks/razorpay ──────────────────────────────────────────────
 
 router.post('/', async (req: Request, res: Response) => {
@@ -113,17 +127,6 @@ router.post('/', async (req: Request, res: Response) => {
 
   if (!razorpayOrderId) {
     return res.status(400).json({ error: 'payment.order_id missing in payload' });
-  }
-
-  // ── Idempotency check ──────────────────────────────────────────────────────
-  // If an order with this idempotency_key already exists, the webhook has been
-  // processed before (duplicate delivery). Return 200 immediately.
-  const existing = await pool.query<{ id: string }>(
-    'SELECT id FROM orders WHERE idempotency_key = $1',
-    [razorpayOrderId]
-  );
-  if (existing.rowCount && existing.rowCount > 0) {
-    return res.status(200).json({ received: true, duplicate: true });
   }
 
   // ── Extract customer and item data from Razorpay payment notes ─────────────
@@ -209,6 +212,16 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(200).json({ received: true, order_id: orderId });
   } catch (err) {
     await client.query('ROLLBACK');
+
+    // A check-then-insert on idempotency_key is racy: two concurrent deliveries
+    // of the same webhook can both pass the SELECT check before either commits
+    // its INSERT, producing duplicate orders. Instead we let the UNIQUE
+    // constraint on orders.idempotency_key be the single source of truth and
+    // treat a 23505 (unique_violation) here as "already processed", not a failure.
+    if (isUniqueViolation(err) && err.constraint === 'orders_idempotency_key_key') {
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+
     console.error('Webhook order write failed, transaction rolled back:', err);
     return res.status(500).json({ error: 'Order processing failed' });
   } finally {
