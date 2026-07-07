@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import ordersRouter from './routes/orders';
 import productsRouter from './routes/products';
 import webhooksRouter from './routes/webhooks';
 
@@ -14,6 +15,7 @@ app.use('/api/webhooks/razorpay', express.raw({ type: 'application/json' }), web
 
 app.use(express.json());
 app.use('/api/products', productsRouter);
+app.use('/api/orders', ordersRouter);
 
 app.listen(PORT, () => {
   console.log(`API server listening on port ${PORT}`);
