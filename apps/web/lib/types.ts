@@ -15,3 +15,22 @@ export interface Product {
   created_at: string
   updated_at: string
 }
+
+export interface ProductVariant {
+  id: string
+  product_id: string
+  sku: string
+  colour: string | null
+  size: string | null
+  fragrance: string | null
+  price: string
+  mrp: string
+  stock_note: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ProductDetail extends Product {
+  variants: ProductVariant[]
+}
