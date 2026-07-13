@@ -34,3 +34,14 @@ export interface ProductVariant {
 export interface ProductDetail extends Product {
   variants: ProductVariant[]
 }
+
+export interface CartItem {
+  productId: string
+  variantId: string
+  name: string
+  category: string
+  variantLabel: string
+  unitPrice: string
+  quantity: number
+  leadTimeDays: number
+}

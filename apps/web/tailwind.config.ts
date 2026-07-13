@@ -14,6 +14,10 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+      },
+      letterSpacing: {
+        editorial: '0.16em',
       },
     },
   },
