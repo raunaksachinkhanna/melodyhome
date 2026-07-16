@@ -4,13 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useCart } from './cart/CartProvider'
-
-const NAV_ITEMS = [
-  { label: 'The Craft', href: '/#the-craft' },
-  { label: 'Collection', href: '/#collection' },
-  { label: 'Our Impact', href: '/#impact' },
-  { label: 'Corporate Gifting', href: '/#corporate-gifting' },
-]
+import { NAV_ITEMS } from '../../lib/nav'
 
 export default function Header() {
   const pathname = usePathname()

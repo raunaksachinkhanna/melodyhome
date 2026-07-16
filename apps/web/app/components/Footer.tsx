@@ -1,11 +1,5 @@
 import Link from 'next/link'
-
-const LINKS = [
-  { label: 'Collection', href: '/#collection' },
-  { label: 'The Craft', href: '/#the-craft' },
-  { label: 'Our Impact', href: '/#impact' },
-  { label: 'Corporate Gifting', href: '/#corporate-gifting' },
-]
+import { NAV_ITEMS } from '../../lib/nav'
 
 export default function Footer() {
   const year = new Date().getUTCFullYear()
@@ -24,7 +18,7 @@ export default function Footer() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-editorial text-gold">Explore</p>
             <ul className="mt-5 space-y-3 text-sm">
-              {LINKS.map((link) => (
+              {NAV_ITEMS.map((link) => (
                 <li key={link.href}>
                   <Link className="text-cream/75 transition-colors hover:text-gold" href={link.href}>
                     {link.label}
